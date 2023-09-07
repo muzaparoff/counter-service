@@ -30,15 +30,30 @@ Before you begin, ensure you have met the following requirements:
    git clone https://github.com/muzaparoff/counter-service.git
    cd counter-service
    docker-compose up -d
+   ```
+
+### Usage
+
+The Counter Service is a simple web service with the following behavior:
+
+A GET request to the root URL (/) returns a web page displaying the current count of POST requests served.
+A POST request to the root URL (/) increments the count.
+You can use web browsers, HTTP clients (e.g., curl, Postman), or scripts to interact with the service.
+
+
+### API Endpoints
+
+GET /: Returns a web page displaying the current count.
+POST /: Increments the count and returns the updated count.
 
 ### Testing
 To run tests for the Counter Service, use the following command:
 
-    shell
-    Copy code
+    ```shell
     python test_counter_service.py
-    Contributing
-    Contributions are welcome! If you would like to contribute to this project, please follow the standard guidelines for open-source contributions.
+    ```
+### Contributing
+Contributions are welcome! If you would like to contribute to this project, please follow the standard guidelines for open-source contributions.
 
 License
 This project is licensed under the Apache 2.0 License - see the LICENSE file for details.
