@@ -1,0 +1,6 @@
+version: '3'
+services:
+  counter-service:
+    image: muzaparoff/counter-service:$(Build.BuildId)
+      - "80:80"
+    restart: always
