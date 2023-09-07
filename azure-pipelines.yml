@@ -4,59 +4,55 @@ trigger:
 pr:
 - '*'
 
-# pool:
-#   vmImage: ubuntu-latest
+pool:
+  vmImage: ubuntu-latest
 
 stages:
 - stage: Build
   jobs:
   - job: BuildJob
     steps:
-    # - checkout: self
-    - task: UsePythonVersion@0
-      inputs:
-        versionSpec: '3.8'
-        addToPath: true
+    - checkout: self
     - script: |
         docker build -t muzaparoff/counter-service:$(Build.BuildId) .
         docker login -u muzaparoff -p sergey86
         docker push muzaparoff/counter-service:$(Build.BuildId)
       displayName: 'Build and push Docker image'
 
-- stage: Deploy
-  jobs:
-  - job: DeployJob
-    steps:
-    - task: UsePythonVersion@0
-      inputs:
-        versionSpec: '3.8'
-        addToPath: true
-    - script: |
-        ssh -i $(Agent.TempDirectory)/devops-exam.pem centos@ec2-3-125-43-16.eu-central-1.compute.amazonaws.com "sudo curl -L https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose && sudo chmod +x /usr/local/bin/docker-compose"
-        scp -i $(Agent.TempDirectory)/devops-exam.pem -r /home/counter-service centos@ec2-3-125-43-16.eu-central-1.compute.amazonaws.com:/home/counter-service/
-        ssh -i $(Agent.TempDirectory)/devops-exam.pem centos@ec2-3-125-43-16.eu-central-1.compute.amazonaws.com "cd /home/counter-service/ && docker-compose up -d $(Build.BuildId)"
-      displayName: 'Deploy to EC2 via SSH'
+# - stage: Deploy
+#   jobs:
+#   - job: DeployJob
+#     steps:
+#     - task: UsePythonVersion@0
+#       inputs:
+#         versionSpec: '3.8'
+#         addToPath: true
+#     - script: |
+#         ssh -i $(Agent.TempDirectory)/devops-exam.pem centos@ec2-3-125-43-16.eu-central-1.compute.amazonaws.com "sudo curl -L https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose && sudo chmod +x /usr/local/bin/docker-compose"
+#         scp -i $(Agent.TempDirectory)/devops-exam.pem -r /home/counter-service centos@ec2-3-125-43-16.eu-central-1.compute.amazonaws.com:/home/counter-service/
+#         ssh -i $(Agent.TempDirectory)/devops-exam.pem centos@ec2-3-125-43-16.eu-central-1.compute.amazonaws.com "cd /home/counter-service/ && docker-compose up -d $(Build.BuildId)"
+#       displayName: 'Deploy to EC2 via SSH'
 
-- stage: HealthCheck
-  jobs:
-  - job: HealthCheckJob
-    steps:
-    - task: UsePythonVersion@0
-      inputs:
-        versionSpec: '3.8'
-        addToPath: true
-    - script: |
-        # Perform a health check here, e.g., using a tool like curl or requests
-        # Wait for the service to start before checking
-        sleep 10  # Adjust the sleep duration as needed
-        response=$(curl -Is http://ec2-3-125-43-16.eu-central-1.compute.amazonaws.com/ | head -n 1)
-        if [[ $response == *"200 OK"* ]]; then
-          echo "Health check passed."
-        else
-          echo "Health check failed."
-          exit 1
-        fi
-      displayName: 'Health check'
+# - stage: HealthCheck
+#   jobs:
+#   - job: HealthCheckJob
+#     steps:
+#     - task: UsePythonVersion@0
+#       inputs:
+#         versionSpec: '3.8'
+#         addToPath: true
+#     - script: |
+#         # Perform a health check here, e.g., using a tool like curl or requests
+#         # Wait for the service to start before checking
+#         sleep 10  # Adjust the sleep duration as needed
+#         response=$(curl -Is http://ec2-3-125-43-16.eu-central-1.compute.amazonaws.com/ | head -n 1)
+#         if [[ $response == *"200 OK"* ]]; then
+#           echo "Health check passed."
+#         else
+#           echo "Health check failed."
+#           exit 1
+#         fi
+#       displayName: 'Health check'
 
 # - stage: Test
 #   jobs:
