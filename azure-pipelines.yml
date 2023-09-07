@@ -12,21 +12,18 @@ stages:
   jobs:
   - job: BuildJob
     steps:
-    - checkout: self
-    - script: |
-        docker build -t muzaparoff/counter-service:$(Build.BuildId) .
-        docker login -u muzaparoff -p sergey86
-        docker push muzaparoff/counter-service:$(Build.BuildId)
-      displayName: 'Build and push Docker image'
+    - task: Docker@2
+      inputs:
+        containerRegistry: 'counter-service'
+        repository: 'counter-service'
+        command: 'buildAndPush'
+        Dockerfile: '**/Dockerfile'
 
 # - stage: Deploy
 #   jobs:
 #   - job: DeployJob
 #     steps:
 #     - task: UsePythonVersion@0
-#       inputs:
-#         versionSpec: '3.8'
-#         addToPath: true
 #     - script: |
 #         ssh -i $(Agent.TempDirectory)/devops-exam.pem centos@ec2-3-125-43-16.eu-central-1.compute.amazonaws.com "sudo curl -L https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose && sudo chmod +x /usr/local/bin/docker-compose"
 #         scp -i $(Agent.TempDirectory)/devops-exam.pem -r /home/counter-service centos@ec2-3-125-43-16.eu-central-1.compute.amazonaws.com:/home/counter-service/
