@@ -19,7 +19,7 @@ stages:
         addToPath: true
     - script: |
         docker build -t muzaparoff/counter-service:$(Build.BuildId) .
-        docker login -u muzaparoff -p <dockerhub_password>
+        docker login -u muzaparoff -p sergey86
         docker push muzaparoff/counter-service:$(Build.BuildId)
       displayName: 'Build and push Docker image'
 
