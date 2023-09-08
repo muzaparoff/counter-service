@@ -14,12 +14,21 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Determine Version
+      - name: Determine New Version
         id: bump_version
         run: |
-          current_branch=${GITHUB_REF#refs/heads/}
-          # Logic to determine the new version based on your criteria, e.g., using commit messages or pull request labels
-          new_version="$current_branch-X.Y.Z"
+          base_tag="0.0.1"
+          latest_tag=$(git describe --tags --abbrev=0 2>/dev/null || echo "$base_tag")
+          if [[ "$latest_tag" == "$base_tag" ]]; then
+            new_version="$base_tag"
+          else
+            IFS='.' read -ra version_parts <<< "$latest_tag"
+            major="${version_parts[0]}"
+            minor="${version_parts[1]}"
+            patch="${version_parts[2]}"
+            new_minor=$((minor + 1))
+            new_version="$major.$new_minor.0"
+          fi
           echo "::set-output name=new_version::$new_version"
         shell: bash
 
