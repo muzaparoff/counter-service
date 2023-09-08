@@ -3,8 +3,8 @@ name: Build, Deploy, and Run Docker Image
 on:
   push:
     branches:
-      - '*'
-      - '!main'  # Exclude the 'main' branch
+      - main
+      - feature/*
 
 jobs:
   build-deploy-and-run:
