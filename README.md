@@ -40,7 +40,6 @@ A GET request to the root URL (/) returns a web page displaying the current coun
 A POST request to the root URL (/) increments the count.
 You can use web browsers, HTTP clients (e.g., curl, Postman), or scripts to interact with the service.
 
-
 ### API Endpoints
 
 GET /: Returns a web page displaying the current count.
