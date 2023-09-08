@@ -29,14 +29,14 @@ jobs:
       - name: Build Docker image
         run: |
           new_version=${{ steps.bump_version.outputs.new_version }}
-          docker build -t your-image-name:$new_version .
+          docker build -t muzaparoff/counter-service:$new_version .
         env:
           DOCKER_BUILDKIT: 1  # Enable BuildKit for improved caching
 
       - name: Push Docker image to Docker Hub
         run: |
           new_version=${{ steps.bump_version.outputs.new_version }}
-          docker push your-image-name:$new_version
+          docker push muzaparoff/counter-service:$new_version
 
       - name: Create Git Tag
         run: |
@@ -53,5 +53,5 @@ jobs:
           port: 22
           script: |
             new_version=${{ steps.bump_version.outputs.new_version }}
-            docker pull your-image-name:$new_version
-            docker run -d --restart=always -p 80:80 your-image-name:$new_version
+            docker pull muzaparoff/counter-service:$new_version
+            docker run -d --restart=always -p 80:80 muzaparoff/counter-service:$new_version
