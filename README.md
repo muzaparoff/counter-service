@@ -49,9 +49,8 @@ POST /: Increments the count and returns the updated count.
 ### Testing
 To run tests for the Counter Service, use the following command:
 
-    ```shell
     python test_counter_service.py
-    ```
+
 ### Contributing
 Contributions are welcome! If you would like to contribute to this project, please follow the standard guidelines for open-source contributions.
 

@@ -32,9 +32,8 @@ stages:
         versionSpec: '3.8'
         addToPath: true
     - script: |
-        ssh -i $(Agent.TempDirectory)/devops-exam.pem centos@ec2-3-125-43-16.eu-central-1.compute.amazonaws.com "sudo curl -L https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m) -o /usr/local/bin/docker-compose && sudo chmod +x /usr/local/bin/docker-compose"
-        scp -i $(Agent.TempDirectory)/devops-exam.pem -r /home/counter-service centos@ec2-3-125-43-16.eu-central-1.compute.amazonaws.com:/home/counter-service/
-        ssh -i $(Agent.TempDirectory)/devops-exam.pem centos@ec2-3-125-43-16.eu-central-1.compute.amazonaws.com "cd /home/counter-service/ && docker-compose up -d $(Build.BuildId)"
+        scp -i $(Agent.TempDirectory)/devops-exam.pem -r docker-compose.yml centos@ec2-3-125-43-16.eu-central-1.compute.amazonaws.com:/home/counter-service/
+        ssh -i $(Agent.TempDirectory)/devops-exam.pem centos@ec2-3-125-43-16.eu-central-1.compute.amazonaws.com "mkdir /home/counter-service && cd /home/counter-service/ && docker-compose up -d $(Build.BuildId)"
       displayName: 'Deploy to EC2 via SSH'
 
 - stage: HealthCheck
