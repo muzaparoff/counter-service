@@ -1,0 +1,57 @@
+name: Build, Deploy, and Run Docker Image
+
+on:
+  push:
+    branches:
+      - '*'
+      - '!main'  # Exclude the 'main' branch
+
+jobs:
+  build-deploy-and-run:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Determine Version
+        id: bump_version
+        run: |
+          current_branch=${GITHUB_REF#refs/heads/}
+          # Logic to determine the new version based on your criteria, e.g., using commit messages or pull request labels
+          new_version="$current_branch-X.Y.Z"
+          echo "::set-output name=new_version::$new_version"
+        shell: bash
+
+      - name: Login to Docker Hub
+        run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login -u ${{ secrets.DOCKERHUB_USERNAME }} --password-stdin
+
+      - name: Build Docker image
+        run: |
+          new_version=${{ steps.bump_version.outputs.new_version }}
+          docker build -t your-image-name:$new_version .
+        env:
+          DOCKER_BUILDKIT: 1  # Enable BuildKit for improved caching
+
+      - name: Push Docker image to Docker Hub
+        run: |
+          new_version=${{ steps.bump_version.outputs.new_version }}
+          docker push your-image-name:$new_version
+
+      - name: Create Git Tag
+        run: |
+          new_version=${{ steps.bump_version.outputs.new_version }}
+          git tag $new_version
+          git push origin $new_version
+
+      - name: Deploy and Run on EC2
+        uses: appleboy/ssh-action@v0.4.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USERNAME }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          port: 22
+          script: |
+            new_version=${{ steps.bump_version.outputs.new_version }}
+            docker pull your-image-name:$new_version
+            docker run -d --restart=always -p 80:80 your-image-name:$new_version
