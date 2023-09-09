@@ -40,7 +40,7 @@ jobs:
           new_version=${{ steps.bump_version.outputs.new_version }}
           docker build -t muzaparoff/counter-service:$new_version .
         env:
-          DOCKER_BUILDKIT: 1  # Enable BuildKit for improved caching
+          DOCKER_BUILDKIT: 1
 
       - name: Push Docker image to Docker Hub
         run: |
@@ -50,6 +50,8 @@ jobs:
       - name: Create Git Tag
         env:
           GIT_SSH_KEY: ${{ secrets.GIT_SSH_KEY }}
+          USER_EMAIL: ${{ secrets.USER_EMAIL }}
+          USER_NAME: ${{ secrets.USER_NAME }}
         run: |
           new_version=${{ steps.bump_version.outputs.new_version }}
           mkdir -p ~/.ssh
