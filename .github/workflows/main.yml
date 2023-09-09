@@ -79,6 +79,7 @@ jobs:
           ssh-keyscan $EC2_HOST >> ~/.ssh/known_hosts
           echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
           echo "$EC2_SSH_KEY" > ~/.ssh/id_rsa_deploy
-          chmod 400 ~/.ssh/id_rsa_deploy
-          ssh -i ~/.ssh/id_rsa_deploy $EC2_USERNAME@$EC2_HOST "docker pull muzaparoff/counter-service:$new_version"
-          ssh -i ~/.ssh/id_rsa_deploy $EC2_USERNAME@$EC2_HOST "docker run -d --restart=always -p 80:80 muzaparoff/counter-service:$new_version"
+          chmod 600 ~/.ssh/id_rsa_deploy
+          echo $EC2_USERNAME $EC2_HOST
+          ssh -v -i ~/.ssh/id_rsa_deploy $EC2_USERNAME@$EC2_HOST "docker pull muzaparoff/counter-service:$new_version"
+          ssh -v -i ~/.ssh/id_rsa_deploy $EC2_USERNAME@$EC2_HOST "docker run -d --restart=always -p 80:80 muzaparoff/counter-service:$new_version"
