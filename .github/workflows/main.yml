@@ -73,10 +73,8 @@ jobs:
         run: |
           new_version=${{ env.new_version }}
           touch ~/.ssh/known_hosts
-          touch ~/.ssh/config
           ssh-keyscan ec2-3-125-43-16.eu-central-1.compute.amazonaws.com >> ~/.ssh/known_hosts
-          echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
           echo "$EC2_SSH_KEY" > ~/.ssh/devops.pem
           chmod 600 ~/.ssh/devops.pem
-          ssh -v -i ~/.ssh/devops.pem centos@ec2-3-125-43-16.eu-central-1.compute.amazonaws.com "docker pull muzaparoff/counter-service:$new_version"
-          ssh -v -i ~/.ssh/devops.pem centos@ec2-3-125-43-16.eu-central-1.compute.amazonaws.com "docker run -d --restart=always -p 80:80 muzaparoff/counter-service:$new_version"
+          ssh -i ~/.ssh/devops.pem -o "StrictHostKeyChecking no" centos@ec2-3-125-43-16.eu-central-1.compute.amazonaws.com "docker pull muzaparoff/counter-service:$new_version"
+          ssh -i ~/.ssh/devops.pem -o "StrictHostKeyChecking no" centos@ec2-3-125-43-16.eu-central-1.compute.amazonaws.com "docker run -d --restart=always -p 80:80 muzaparoff/counter-service:$new_version"
