@@ -74,7 +74,7 @@ jobs:
           EC2_HOST: ${{ secrets.EC2_HOST }}
         run: |
           new_version=${{ env.new_version }}
-          apt-get update -y && apt-get install openssh-client wget gnupg -y
+          sudo apt-get update -y && apt-get install openssh-client wget gnupg -y
           wget -qO- https://get.docker.com/gpg | apt-key add -
           touch ~/.ssh/known_hosts
           touch ~/.ssh/config
