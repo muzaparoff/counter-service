@@ -74,7 +74,12 @@ jobs:
           EC2_HOST: ${{ secrets.EC2_HOST }}
         run: |
           new_version=${{ env.new_version }}
+          apt-get update -y && apt-get install openssh-client wget gnupg -y
+          wget -qO- https://get.docker.com/gpg | apt-key add -
+          touch ~/.ssh/known_hosts
+          touch ~/.ssh/config
           ssh-keyscan $EC2_HOST >> ~/.ssh/known_hosts
+          echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
           echo "$EC2_SSH_KEY" > ~/.ssh/id_rsa_deploy
           chmod 400 ~/.ssh/id_rsa_deploy
           ssh -i ~/.ssh/id_rsa_deploy $EC2_USERNAME@$EC2_HOST "docker pull muzaparoff/counter-service:$new_version"
