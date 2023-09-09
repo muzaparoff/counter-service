@@ -19,6 +19,7 @@ jobs:
         run: |
           ## Check if the base tag 0.0.1 exists
           if ! git rev-parse --verify 0.0.1 >/dev/null 2>&1; then
+            echo "0.0.1 doesn't exist"
             new_version="0.0.1"
           else
             # Find the latest patch version
@@ -29,6 +30,7 @@ jobs:
             patch="${version_parts[2]}"
             new_patch=$((patch + 1))
             new_version="$major.$minor.$new_patch"
+            echo "latest_patch=$latest_patch"
           fi
           echo "new_version=$new_version" >> $GITHUB_ENV
         shell: bash
