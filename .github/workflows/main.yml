@@ -58,19 +58,20 @@ jobs:
           echo "$GIT_SSH_KEY" > ~/.ssh/id_rsa
           chmod 600 ~/.ssh/id_rsa
           ssh-keyscan github.com >> ~/.ssh/known_hosts
-          git config --local user.email "${{ secrets.USER_EMAIL }}"
-          git config --local user.name "${{ secrets.USER_NAME }}"
+          git config --local user.email github-actions[bot]@users.noreply.github.com
+          git config --local user.name github-actions[bot]
           git tag $new_version
           git push origin $new_version
 
-      - name: Deploy and Run on EC2
-        uses: appleboy/ssh-action@v1.0.0
-        with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ${{ secrets.EC2_USERNAME }}
-          key: ${{ secrets.EC2_SSH_KEY }}
-          port: 22
-          script: |
-            new_version=${{ steps.bump_version.outputs.new_version }}
-            docker pull muzaparoff/counter-service:$new_version
-            docker run -d --restart=always -p 80:80 muzaparoff/counter-service:$new_version
+      - name: Configure SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Deploy Docker Container
+        run: |
+          new_version=${{ steps.bump_version.outputs.new_version }}
+          ssh -i ~/.ssh/id_rsa ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} "docker pull muzaparoff/counter-service:$new_version"
+          ssh -i ~/.ssh/id_rsa ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} "docker run -d --restart=always -p 80:80 muzaparoff/counter-service:$new_version"
