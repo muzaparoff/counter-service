@@ -48,14 +48,18 @@ jobs:
           docker push muzaparoff/counter-service:$new_version
 
       - name: Create Git Tag
+        env:
+          GIT_SSH_KEY: ${{ secrets.GIT_SSH_KEY }}
         run: |
           new_version=${{ steps.bump_version.outputs.new_version }}
+          mkdir -p ~/.ssh
+          echo "$GIT_SSH_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan github.com >> ~/.ssh/known_hosts
           git config --local user.email "${{ secrets.USER_EMAIL }}"
           git config --local user.name "${{ secrets.USER_NAME }}"
           git tag $new_version
           git push origin $new_version
-        env:
-          GIT_SSH_COMMAND: 'ssh -o StrictHostKeyChecking=no -i ${{ secrets.GIT_SSH_KEY }}'
 
       - name: Deploy and Run on EC2
         uses: appleboy/ssh-action@v1.0.0
