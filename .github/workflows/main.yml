@@ -70,16 +70,13 @@ jobs:
       - name: Deploy Docker Container on EC2
         env:
           EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
-          EC2_USERNAME: ${{ secrets.EC2_USERNAME }}
-          EC2_HOST: ${{ secrets.EC2_HOST }}
         run: |
           new_version=${{ env.new_version }}
           touch ~/.ssh/known_hosts
           touch ~/.ssh/config
-          ssh-keyscan $EC2_HOST >> ~/.ssh/known_hosts
+          ssh-keyscan ec2-3-125-43-16.eu-central-1.compute.amazonaws.com >> ~/.ssh/known_hosts
           echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
-          echo "$EC2_SSH_KEY" > ~/.ssh/id_rsa_deploy
-          chmod 600 ~/.ssh/id_rsa_deploy
-          echo $EC2_USERNAME $EC2_HOST
-          ssh -v -i ~/.ssh/id_rsa_deploy $EC2_USERNAME@$EC2_HOST "docker pull muzaparoff/counter-service:$new_version"
-          ssh -v -i ~/.ssh/id_rsa_deploy $EC2_USERNAME@$EC2_HOST "docker run -d --restart=always -p 80:80 muzaparoff/counter-service:$new_version"
+          echo "$EC2_SSH_KEY" > ~/.ssh/devops.pem
+          chmod 600 ~/.ssh/devops.pem
+          ssh -v -i ~/.ssh/devops.pem centos@ec2-3-125-43-16.eu-central-1.compute.amazonaws.com "docker pull muzaparoff/counter-service:$new_version"
+          ssh -v -i ~/.ssh/devops.pem centos@ec2-3-125-43-16.eu-central-1.compute.amazonaws.com "docker run -d --restart=always -p 80:80 muzaparoff/counter-service:$new_version"
