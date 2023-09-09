@@ -13,6 +13,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+      
+      - name: Fetch All Tags
+        run: git fetch --tags
 
       - name: Determine New Version
         id: bump_version
@@ -53,8 +56,6 @@ jobs:
       - name: Create Git Tag
         env:
           GIT_SSH_KEY: ${{ secrets.GIT_SSH_KEY }}
-          USER_EMAIL: ${{ secrets.USER_EMAIL }}
-          USER_NAME: ${{ secrets.USER_NAME }}
         run: |
           new_version=${{ env.new_version }}
           mkdir -p ~/.ssh
