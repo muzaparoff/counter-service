@@ -68,10 +68,14 @@ jobs:
           git push origin $new_version
 
       - name: Deploy Docker Container on EC2
+        env:
+          EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+          EC2_USERNAME: ${{ secrets.EC2_USERNAME }}
+          EC2_HOST: ${{ secrets.EC2_HOST }}
         run: |
           new_version=${{ env.new_version }}
-          ssh-keyscan ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
-          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa_deploy
+          ssh-keyscan $EC2_HOST >> ~/.ssh/known_hosts
+          echo "$EC2_SSH_KEY" > ~/.ssh/id_rsa_deploy
           chmod 400 ~/.ssh/id_rsa_deploy
-          ssh -i ~/.ssh/id_rsa_deploy ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} "docker pull muzaparoff/counter-service:$new_version"
-          ssh -i ~/.ssh/id_rsa_deploy ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} "docker run -d --restart=always -p 80:80 muzaparoff/counter-service:$new_version"
+          ssh -i ~/.ssh/id_rsa_deploy $EC2_USERNAME@$EC2_HOST "docker pull muzaparoff/counter-service:$new_version"
+          ssh -i ~/.ssh/id_rsa_deploy $EC2_USERNAME@$EC2_HOST "docker run -d --restart=always -p 80:80 muzaparoff/counter-service:$new_version"
