@@ -67,15 +67,11 @@ jobs:
           git tag $new_version
           git push origin $new_version
 
-      - name: Configure SSH
-        run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa
-          chmod 600 ~/.ssh/id_rsa
-          ssh-keyscan ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
-
-      - name: Deploy Docker Container
+      - name: Deploy Docker Container on EC2
         run: |
           new_version=${{ env.new_version }}
-          ssh -i ~/.ssh/id_rsa ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} "docker pull muzaparoff/counter-service:$new_version"
-          ssh -i ~/.ssh/id_rsa ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} "docker run -d --restart=always -p 80:80 muzaparoff/counter-service:$new_version"
+          ssh-keyscan ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+          echo "${{ secrets.EC2_SSH_KEY }}" > ~/.ssh/id_rsa_deploy
+          chmod 400 ~/.ssh/id_rsa_deploy
+          ssh -i ~/.ssh/id_rsa_deploy ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} "docker pull muzaparoff/counter-service:$new_version"
+          ssh -i ~/.ssh/id_rsa_deploy ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} "docker run -d --restart=always -p 80:80 muzaparoff/counter-service:$new_version"
