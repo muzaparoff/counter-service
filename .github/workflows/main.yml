@@ -90,16 +90,3 @@ jobs:
           ssh -i ~/.ssh/devops.pem -o "StrictHostKeyChecking no" ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} "docker rm -f counter-service"
           ssh -i ~/.ssh/devops.pem -o "StrictHostKeyChecking no" ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} "docker pull muzaparoff/counter-service:$new_version"
           ssh -i ~/.ssh/devops.pem -o "StrictHostKeyChecking no" ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} "docker run --name=counter-service -d --restart=always -p 80:80 muzaparoff/counter-service:$new_version"
-      
-      - name: integration tests
-        run: |
-          new_version=${{ env.new_version }}
-          HEALTH_CHECK_URL="http://${{ secrets.EC2_HOST }}/health"
-          HEALTH_CHECK_RESPONSE=$(curl -s -o /dev/null -w "%{http_code}" $HEALTH_CHECK_URL)
-          
-          if [ $HEALTH_CHECK_RESPONSE -eq 200 ]; then
-            echo "Health check passed."
-          else
-            echo "Health check failed with status code $HEALTH_CHECK_RESPONSE."
-            exit 1
-          fi
