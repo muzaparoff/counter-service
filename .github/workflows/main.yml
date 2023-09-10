@@ -7,7 +7,7 @@ on:
       - feature/*
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
@@ -78,22 +78,16 @@ jobs:
           git tag $new_version
           git push origin $new_version
   
-  deploy:
-    runs-on: ubuntu-latest
-    needs: build
-
-    steps:
       - name: Deploy Docker Container on EC2
         env:
           EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
         run: |
           new_version=${{ env.new_version }}
-          mkdir -p ~/.ssh
           touch ~/.ssh/known_hosts
           ssh-keyscan ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
           echo "$EC2_SSH_KEY" > ~/.ssh/devops.pem
           chmod 600 ~/.ssh/devops.pem
-          # ssh -i ~/.ssh/devops.pem -o "StrictHostKeyChecking no" ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} "docker rm -f counter-service"
+          ssh -i ~/.ssh/devops.pem -o "StrictHostKeyChecking no" ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} "docker rm -f counter-service"
           ssh -i ~/.ssh/devops.pem -o "StrictHostKeyChecking no" ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} "docker pull muzaparoff/counter-service:$new_version"
           ssh -i ~/.ssh/devops.pem -o "StrictHostKeyChecking no" ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} "docker run --name=counter-service -d --restart=always -p 80:80 muzaparoff/counter-service:$new_version"
       
