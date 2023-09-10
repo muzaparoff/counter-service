@@ -44,6 +44,7 @@ You can use web browsers, HTTP clients (e.g., curl, Postman), or scripts to inte
 
 GET /: Returns a web page displaying the current count.
 POST /: Increments the count and returns the updated count.
+GET /health: Returns a status code of 200 (OK), it prints "Health check passed" to the workflow logs.
 
 ### Testing
 To run tests for the Counter Service, use the following command:
