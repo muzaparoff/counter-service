@@ -1,25 +1,20 @@
 import unittest
-import requests
+from counter_service import app
 
-class TestCounterService(unittest.TestCase):
+class TestApp(unittest.TestCase):
+
     def setUp(self):
-        self.url = "http://localhost/"
+        self.app = app.test_client()
 
-    def test_get_request(self):
-        response = requests.get(self.url)
-        
+    def test_index(self):
+        response = self.app.get('/')
         self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.data.decode('utf-8'), '1')
 
-        self.assertTrue(response.text.startswith("Counter: "))
-        self.assertTrue(response.text[9:].isdigit())
-
-    def test_post_request(self):
-        response = requests.post(self.url)
-        
+    def test_post(self):
+        response = self.app.post('/post')
         self.assertEqual(response.status_code, 200)
-
-        self.assertTrue(response.text.startswith("Counter: "))
-        self.assertTrue(response.text[9:].isdigit())
+        self.assertEqual(response.data.decode('utf-8'), 'OK')
 
 if __name__ == '__main__':
     unittest.main()

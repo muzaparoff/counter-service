@@ -1,2 +1,0 @@
-unittest==2.0.0
-requests==2.22.0P
