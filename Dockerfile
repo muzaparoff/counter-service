@@ -1,9 +1,13 @@
 FROM python:3.8
 
-RUN pip install flask gevent
-
-COPY counter_service.py /app/counter_service.py
-
 WORKDIR /app
+
+COPY requirements.txt /app/
+
+RUN pip install --no-cache-dir -r requirements.txt
+
+COPY . /app/counter_service.py
+
+EXPOSE 80
 
 CMD ["python", "counter_service.py"]

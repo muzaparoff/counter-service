@@ -87,6 +87,8 @@ jobs:
           ssh-keyscan ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
           echo "$EC2_SSH_KEY" > ~/.ssh/devops.pem
           chmod 600 ~/.ssh/devops.pem
-          ssh -i ~/.ssh/devops.pem -o "StrictHostKeyChecking no" ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} "docker rm -f counter-service"
-          ssh -i ~/.ssh/devops.pem -o "StrictHostKeyChecking no" ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} "docker pull muzaparoff/counter-service:$new_version"
-          ssh -i ~/.ssh/devops.pem -o "StrictHostKeyChecking no" ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} "docker run --name=counter-service -d --restart=always -p 80:80 muzaparoff/counter-service:$new_version"
+          # ssh -i ~/.ssh/devops.pem -o "StrictHostKeyChecking no" ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} "docker rm -f counter-service"
+          # ssh -i ~/.ssh/devops.pem -o "StrictHostKeyChecking no" ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} "docker pull muzaparoff/counter-service:$new_version"
+          # ssh -i ~/.ssh/devops.pem -o "StrictHostKeyChecking no" ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} "docker run --name=counter-service -d --restart=always -p 80:80 muzaparoff/counter-service:$new_version"
+          ssh -i ~/.ssh/devops.pem -o "StrictHostKeyChecking no" ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} "mkdir -p /home/counter_service && cp docker-compose.yml /home/counter_service/dcoker-compose.yml"
+          ssh -i ~/.ssh/devops.pem -o "StrictHostKeyChecking no" ${{ secrets.EC2_USERNAME }}@${{ secrets.EC2_HOST }} "cd /home/counter_service && docker-compose up -d --build --env new_version=$new_version --local --remove-orphans --force-recreate"
