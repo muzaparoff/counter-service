@@ -22,6 +22,7 @@ def set_db_file(path):
     db_file = path
 
 def init_db():
+    logging.info(f'Initializing database at {db_file}')
     conn = sqlite3.connect(db_file)
     cursor = conn.cursor()
     cursor.execute('''
