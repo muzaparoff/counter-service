@@ -17,6 +17,10 @@ rabbitmq_queue = 'counter_queue'
 # SQLite database file
 db_file = '/app/data/counter.db'
 
+def set_db_file(path):
+    global db_file
+    db_file = path
+
 def init_db():
     conn = sqlite3.connect(db_file)
     cursor = conn.cursor()

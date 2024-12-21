@@ -2,7 +2,7 @@ import unittest
 import asyncio
 from unittest.mock import AsyncMock, patch
 from quart import Quart
-from counter_service import app, init_db, update_counter_in_db, get_counter_from_db
+from counter_service import app, init_db, set_db_file
 
 class TestCounterService(unittest.IsolatedAsyncioTestCase):
 
@@ -12,8 +12,7 @@ class TestCounterService(unittest.IsolatedAsyncioTestCase):
         self.app.testing = True
 
         # Use an in-memory SQLite database for testing
-        global db_file
-        db_file = ':memory:'
+        set_db_file(':memory:')
         init_db()
 
         # Create a mock RabbitMQ connection and channel for testing
