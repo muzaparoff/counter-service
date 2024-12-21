@@ -2,7 +2,7 @@ import unittest
 import asyncio
 from unittest.mock import AsyncMock, patch
 from quart import Quart
-from counter_service import app
+from counter_service import app, init_db, update_counter_in_db, get_counter_from_db
 
 class TestCounterService(unittest.IsolatedAsyncioTestCase):
 
@@ -10,6 +10,11 @@ class TestCounterService(unittest.IsolatedAsyncioTestCase):
         # Initialize Quart app for testing
         self.app = app.test_client()
         self.app.testing = True
+
+        # Use an in-memory SQLite database for testing
+        global db_file
+        db_file = ':memory:'
+        init_db()
 
         # Create a mock RabbitMQ connection and channel for testing
         self.mock_connection = AsyncMock()
@@ -31,29 +36,30 @@ class TestCounterService(unittest.IsolatedAsyncioTestCase):
 
     async def asyncTearDown(self):
         # Clean up resources and connections
-        await self.app.aclose()
         await self.mock_connection.close()
 
     async def test_post_request_increments_counter(self):
         # Simulate a POST request to increment the counter
-        response = await self.app.post('/')
-        self.assertEqual(response.status_code, 200)
+        async with self.app as client:
+            response = await client.post('/')
+            self.assertEqual(response.status_code, 200)
 
-        # Simulate a GET request to retrieve the counter value
-        response = await self.app.get('/')
-        self.assertEqual(response.status_code, 200)
-        self.assertIn(b'Counter: 1', await response.get_data())
+            # Simulate a GET request to retrieve the counter value
+            response = await client.get('/')
+            self.assertEqual(response.status_code, 200)
+            self.assertIn(b'Counter: 1', await response.get_data())
 
     async def test_multiple_post_requests(self):
         # Simulate multiple POST requests to increment the counter
-        for _ in range(5):
-            response = await self.app.post('/')
-            self.assertEqual(response.status_code, 200)
+        async with self.app as client:
+            for _ in range(5):
+                response = await client.post('/')
+                self.assertEqual(response.status_code, 200)
 
-        # Simulate a GET request to retrieve the counter value
-        response = await self.app.get('/')
-        self.assertEqual(response.status_code, 200)
-        self.assertIn(b'Counter: 5', await response.get_data())
+            # Simulate a GET request to retrieve the counter value
+            response = await client.get('/')
+            self.assertEqual(response.status_code, 200)
+            self.assertIn(b'Counter: 5', await response.get_data())
 
 if __name__ == '__main__':
     unittest.main()
