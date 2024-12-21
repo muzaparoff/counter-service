@@ -32,30 +32,67 @@ Before you begin, ensure you have met the following requirements:
    ```shell
    git clone https://github.com/muzaparoff/counter-service.git
    cd counter-service
+   ```
+
+2. Start the service using Docker Compose:
+
+   ```shell
    docker-compose up -d
    ```
+
+3. Open your web browser and navigate to `http://localhost:5000` to see the Counter Service in action.
+
+### Connecting to RabbitMQ
+
+To connect to RabbitMQ running on localhost, use the following command in your terminal:
+
+```shell
+docker run -d --hostname my-rabbit --name some-rabbit rabbitmq:3
+```
+
+You can then access the RabbitMQ management interface by navigating to `http://localhost:15672` in your web browser. The default username and password are both `guest`.
 
 ### Usage
 
 The Counter Service is a simple web service with the following behavior:
 
-A GET request to the root URL (/) returns a web page displaying the current count of POST requests served.
-A POST request to the root URL (/) increments the count.
+- A GET request to the root URL (/) returns a web page displaying the current count of POST requests served.
+- A POST request to the root URL (/) increments the count.
+
 You can use web browsers, HTTP clients (e.g., curl, Postman), or scripts to interact with the service.
 
 ### API Endpoints
 
-GET /: Returns a web page displaying the current count.
-POST /: Increments the count and returns the updated count.
-GET /health: Returns a status code of 200 (OK), it prints "Health check passed" to the workflow logs.
+- GET /: Returns a web page displaying the current count.
+- POST /: Increments the count and returns the updated count.
+- GET /health: Returns a status code of 200 (OK), it prints "Health check passed" to the workflow logs.
 
 ### Testing
+
 To run tests for the Counter Service, use the following command:
 
+1. Navigate to the project directory:
+
+    ```shell
+    cd counter-service
+    ```
+
+2. Install the necessary dependencies:
+
+    ```shell
+    pip install -r requirements.txt
+    ```
+
+3. Run the tests:
+
+    ```shell
     python test_counter_service.py
+    ```
 
 ### Contributing
+
 Contributions are welcome! If you would like to contribute to this project, please follow the standard guidelines for open-source contributions.
 
-License
+### License
+
 This project is licensed under the Apache 2.0 License - see the LICENSE file for details.
